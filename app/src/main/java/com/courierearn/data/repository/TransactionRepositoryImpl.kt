@@ -71,16 +71,18 @@ class TransactionRepositoryImpl @Inject constructor(
     suspend fun getMonthlyStatistics(yearMonth: String): MonthlyStatistics? {
         val totalCashCollect = transactionDao.getTotalCashCollectByMonth(yearMonth) ?: 0
         val totalSenderPay = transactionDao.getTotalSenderPayByMonth(yearMonth) ?: 0
-        val totalRejectedFoc = transactionDao.getTotalRejectedFocByMonth(yearMonth) ?: 0
+        val totalRejected = transactionDao.getTotalRejectedByMonth(yearMonth) ?: 0
+        val totalFoc = transactionDao.getTotalFocByMonth(yearMonth) ?: 0
         val totalEc = transactionDao.getTotalEcByMonth(yearMonth) ?: 0
         val totalEarnings = transactionDao.getTotalEarningsByMonth(yearMonth) ?: 0
         
         return MonthlyStatistics(
             yearMonth = yearMonth,
-            totalCashCollectCount = totalCashCollect,
-            totalSenderPayCount = totalSenderPay,
-            totalRejectedFocCount = totalRejectedFoc,
-            totalEcCount = totalEc,
+            totalCashCollect = totalCashCollect,
+            totalSenderPay = totalSenderPay,
+            totalRejected = totalRejected,
+            totalFoc = totalFoc,
+            totalEc = totalEc,
             totalEarnings = totalEarnings
         )
     }
@@ -91,18 +93,20 @@ class TransactionRepositoryImpl @Inject constructor(
         
         if (stats != null) {
             val calculation = MonthlySummaryEntity.calculateMonthlySummary(
-                totalCashCollectCount = stats.totalCashCollectCount,
-                totalSenderPayCount = stats.totalSenderPayCount,
-                totalRejectedFocCount = stats.totalRejectedFocCount,
-                totalEcCount = stats.totalEcCount
+                totalCashCollect = stats.totalCashCollect,
+                totalSenderPay = stats.totalSenderPay,
+                totalRejected = stats.totalRejected,
+                totalFoc = stats.totalFoc,
+                totalEc = stats.totalEc
             )
             
             val summary = MonthlySummaryEntity(
                 yearMonth = yearMonth,
-                totalCashCollectCount = stats.totalCashCollectCount,
-                totalSenderPayCount = stats.totalSenderPayCount,
-                totalRejectedFocCount = stats.totalRejectedFocCount,
-                totalEcCount = stats.totalEcCount,
+                totalCashCollect = stats.totalCashCollect,
+                totalSenderPay = stats.totalSenderPay,
+                totalRejected = stats.totalRejected,
+                totalFoc = stats.totalFoc,
+                totalEc = stats.totalEc,
                 standardEarnings = calculation.standardEarnings,
                 ecBonus = calculation.ecBonus,
                 monthlyTotal = calculation.monthlyTotal,
@@ -116,10 +120,11 @@ class TransactionRepositoryImpl @Inject constructor(
     
     data class MonthlyStatistics(
         val yearMonth: String,
-        val totalCashCollectCount: Int,
-        val totalSenderPayCount: Int,
-        val totalRejectedFocCount: Int,
-        val totalEcCount: Int,
+        val totalCashCollect: Int,
+        val totalSenderPay: Int,
+        val totalRejected: Int,
+        val totalFoc: Int,
+        val totalEc: Int,
         val totalEarnings: Int
     )
 }

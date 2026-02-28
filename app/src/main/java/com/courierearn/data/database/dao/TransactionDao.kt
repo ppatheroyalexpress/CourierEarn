@@ -23,16 +23,19 @@ interface TransactionDao {
     @Query("SELECT COUNT(*) FROM transactions WHERE date = :date")
     suspend fun getTransactionCountForDate(date: LocalDate): Int
     
-    @Query("SELECT SUM(cashCollectCount) FROM transactions WHERE strftime('%Y-%m', date) = :yearMonth")
+    @Query("SELECT SUM(cashCollect) FROM transactions WHERE strftime('%Y-%m', date) = :yearMonth")
     suspend fun getTotalCashCollectByMonth(yearMonth: String): Int?
     
-    @Query("SELECT SUM(senderPayCount) FROM transactions WHERE strftime('%Y-%m', date) = :yearMonth")
+    @Query("SELECT SUM(senderPay) FROM transactions WHERE strftime('%Y-%m', date) = :yearMonth")
     suspend fun getTotalSenderPayByMonth(yearMonth: String): Int?
     
-    @Query("SELECT SUM(rejectedFocCount) FROM transactions WHERE strftime('%Y-%m', date) = :yearMonth")
-    suspend fun getTotalRejectedFocByMonth(yearMonth: String): Int?
+    @Query("SELECT SUM(rejected) FROM transactions WHERE strftime('%Y-%m', date) = :yearMonth")
+    suspend fun getTotalRejectedByMonth(yearMonth: String): Int?
     
-    @Query("SELECT SUM(ecCount) FROM transactions WHERE strftime('%Y-%m', date) = :yearMonth")
+    @Query("SELECT SUM(foc) FROM transactions WHERE strftime('%Y-%m', date) = :yearMonth")
+    suspend fun getTotalFocByMonth(yearMonth: String): Int?
+    
+    @Query("SELECT SUM(ec) FROM transactions WHERE strftime('%Y-%m', date) = :yearMonth")
     suspend fun getTotalEcByMonth(yearMonth: String): Int?
     
     @Query("SELECT SUM(dailyTotal) FROM transactions WHERE strftime('%Y-%m', date) = :yearMonth")

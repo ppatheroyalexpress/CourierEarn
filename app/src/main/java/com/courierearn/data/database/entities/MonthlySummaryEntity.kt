@@ -8,10 +8,11 @@ import java.time.YearMonth
 data class MonthlySummaryEntity(
     @PrimaryKey 
     val yearMonth: YearMonth,
-    val totalCashCollectCount: Int,
-    val totalSenderPayCount: Int,
-    val totalRejectedFocCount: Int,
-    val totalEcCount: Int,
+    val totalCashCollect: Int,
+    val totalSenderPay: Int,
+    val totalRejected: Int,
+    val totalFoc: Int,
+    val totalEc: Int,
     val standardEarnings: Int,
     val ecBonus: Int,
     val monthlyTotal: Int,
@@ -20,13 +21,14 @@ data class MonthlySummaryEntity(
 ) {
     companion object {
         fun calculateMonthlySummary(
-            totalCashCollectCount: Int,
-            totalSenderPayCount: Int,
-            totalRejectedFocCount: Int,
-            totalEcCount: Int
+            totalCashCollect: Int,
+            totalSenderPay: Int,
+            totalRejected: Int,
+            totalFoc: Int,
+            totalEc: Int
         ): MonthlyCalculation {
-            val standardEarnings = (totalCashCollectCount * 200) + (totalSenderPayCount * 100) + (totalRejectedFocCount * 0)
-            val ecBonus = totalEcCount * 600
+            val standardEarnings = (totalCashCollect * 200) + (totalSenderPay * 100) + (totalRejected * 0) + (totalFoc * 0)
+            val ecBonus = totalEc * 600
             val monthlyTotal = standardEarnings + ecBonus
             
             return MonthlyCalculation(

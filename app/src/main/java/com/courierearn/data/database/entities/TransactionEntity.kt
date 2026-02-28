@@ -10,10 +10,11 @@ data class TransactionEntity(
     @PrimaryKey 
     val id: String,
     val date: LocalDate,
-    val cashCollectCount: Int,
-    val senderPayCount: Int,
-    val rejectedFocCount: Int,
-    val ecCount: Int,
+    val cashCollect: Int,
+    val senderPay: Int,
+    val rejected: Int,
+    val foc: Int,
+    val ec: Int,
     val dailyTotal: Int,
     val createdAt: Instant,
     val updatedAt: Instant
@@ -21,11 +22,16 @@ data class TransactionEntity(
     // Calculate daily total based on transaction types
     companion object {
         fun calculateDailyTotal(
-            cashCollectCount: Int,
-            senderPayCount: Int,
-            rejectedFocCount: Int
+            cashCollect: Int,
+            senderPay: Int,
+            rejected: Int,
+            foc: Int
         ): Int {
-            return (cashCollectCount * 200) + (senderPayCount * 100) + (rejectedFocCount * 0)
+            return (cashCollect * 200) + (senderPay * 100) + (rejected * 0) + (foc * 0)
+        }
+        
+        fun generateId(date: LocalDate): String {
+            return "transaction_${date.toString()}"
         }
     }
 }

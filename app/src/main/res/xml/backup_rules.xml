@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+   Sample backup rules file; uncomment and customize as necessary.
+   See https://developer.android.com/guide/topics/data/autobackup
+   for details.
+   Note: This file is ignored for devices older that API 23, even if they have
+   the Auto Backup feature available.
+-->
+<full-backup-content>
+    <!--
+   <include domain="sharedpref" path="."/>
+   <exclude domain="sharedpref" path="device.xml"/>
+-->
+    <!-- Include app data -->
+    <include domain="database" path="." />
+    <include domain="sharedpref" path="." />
+    
+    <!-- Exclude sensitive data -->
+    <exclude domain="sharedpref" path="user_preferences.xml" />
+</full-backup-content>

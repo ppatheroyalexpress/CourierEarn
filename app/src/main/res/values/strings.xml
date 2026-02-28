@@ -1,0 +1,69 @@
+<resources>
+    <string name="app_name">CourierEarn</string>
+    
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_data_entry">Data Entry</string>
+    <string name="nav_calendar">Calendar</string>
+    <string name="nav_reports">Reports</string>
+    <string name="nav_settings">Settings</string>
+    
+    <!-- Transaction Types -->
+    <string name="cash_collect">Cash Collect</string>
+    <string name="sender_pay">Sender Pay</string>
+    <string name="rejected_foc">Rejected/FOC</string>
+    <string name="ec_count">EC Count</string>
+    
+    <!-- Values -->
+    <string name="cash_collect_value">200 MMK</string>
+    <string name="sender_pay_value">100 MMK</string>
+    <string name="rejected_foc_value">0 MMK</string>
+    <string name="ec_value">600 MMK (month end)</string>
+    
+    <!-- Common -->
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="today">Today</string>
+    <string name="total">Total</string>
+    <string name="earnings">Earnings</string>
+    <string name="date">Date</string>
+    
+    <!-- Data Entry -->
+    <string name="enter_quantity">Enter Quantity</string>
+    <string name="select_date">Select Date</string>
+    <string name="data_entry_success">Data saved successfully</string>
+    <string name="data_entry_error">Error saving data</string>
+    
+    <!-- Reports -->
+    <string name="monthly_report">Monthly Report</string>
+    <string name="weekly_report">Weekly Report</string>
+    <string name="export_pdf">Export PDF</string>
+    <string name="print_receipt">Print Receipt</string>
+    <string name="backup_data">Backup Data</string>
+    <string name="restore_data">Restore Data</string>
+    
+    <!-- Settings -->
+    <string name="daily_reminder">Daily Reminder</string>
+    <string name="reminder_time">8:00 PM</string>
+    <string name="enable_reminder">Enable Reminder</string>
+    <string name="about">About</string>
+    <string name="version">Version</string>
+    
+    <!-- Notifications -->
+    <string name="reminder_notification_title">CourierEarn Reminder</string>
+    <string name="reminder_notification_text">Don\'t forget to enter today\'s delivery data!</string>
+    
+    <!-- Permissions -->
+    <string name="permission_required">Permission Required</string>
+    <string name="grant_permission">Grant Permission</string>
+    <string name="storage_permission_required">Storage permission is required for backup/restore functionality</string>
+    <string name="bluetooth_permission_required">Bluetooth permission is required for printing functionality</string>
+    
+    <!-- Errors -->
+    <string name="error_generic">An error occurred</string>
+    <string name="error_network">Network error</string>
+    <string name="error_file_not_found">File not found</string>
+    <string name="error_invalid_data">Invalid data</string>
+</resources>

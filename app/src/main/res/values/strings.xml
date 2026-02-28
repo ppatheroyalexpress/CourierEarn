@@ -78,6 +78,24 @@
     <string name="view_all">View All</string>
     <string name="no_transactions_yet">No transactions yet. Start adding data to see your earnings!</string>
     
-    <!-- Transaction Summary -->
-    <string name="transaction_summary_format">Cash Collect: %d, Sender Pay: %d, EC: %d</string>
+    <!-- Data Entry Screen -->
+    <string name="select_date">Select Date</string>
+    <string name="enter_transaction_details">Enter Transaction Details</string>
+    <string name="enter_quantity">Enter Quantity</string>
+    <string name="cash_collect_label">Cash Collect</string>
+    <string name="sender_pay_label">Sender Pay</string>
+    <string name="rejected_foc_label">Rejected/FOC</string>
+    <string name="ec_count_label">EC Count</string>
+    <string name="mmk_each">%d MMK each</string>
+    <string name="mmk_month_end">%d MMK each (month end)</string>
+    <string name="clear_form">Clear Form</string>
+    <string name="save_transaction">Save Transaction</string>
+    <string name="daily_total">Daily Total</string>
+    <string name="saving">Saving...</string>
+    <string name="transaction_saved_success">Transaction saved successfully!</string>
+    
+    <!-- Data Entry Validation -->
+    <string name="please_enter_valid_numbers">Please enter valid numbers</string>
+    <string name="failed_to_save_transaction">Failed to save transaction: %s</string>
+    <string name="error_saving_transaction">Error saving transaction: %s</string>
 </resources>

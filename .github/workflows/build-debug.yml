@@ -31,25 +31,31 @@ jobs:
 
     - name: Install Gradle
       run: |
-        # Download Gradle with retry and timeout
-        wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 -t 5 https://services.gradle.org/distributions/gradle-8.0.2-bin.zip
+        # Download Gradle with curl (more reliable than wget)
+        curl -L -o gradle.zip https://services.gradle.org/distributions/gradle-8.0.2-bin.zip
         
         # Validate download
-        if [ ! -f gradle-8.0.2-bin.zip ]; then
+        if [ ! -f gradle.zip ]; then
           echo " Gradle download failed - file not found"
           exit 1
         fi
         
         # Check file size (should be ~90MB for complete download)
-        FILE_SIZE=$(wc -c < gradle-8.0.2-bin.zip)
-        if [ $FILE_SIZE -lt 1000000 ]; then
-          echo " Gradle zip file is too small (corrupted download)"
+        FILE_SIZE=$(stat -c%s gradle.zip)
+        if [ $FILE_SIZE -lt 90000000 ]; then
+          echo " Gradle zip file is too small: $FILE_SIZE bytes (expected ~90MB)"
+          exit 1
+        fi
+        
+        # Test zip integrity
+        if ! unzip -t gradle.zip > /dev/null 2>&1; then
+          echo " Gradle zip file is corrupted"
           exit 1
         fi
         
         # Extract and setup
         echo " Gradle downloaded successfully, extracting..."
-        unzip -q gradle-8.0.2-bin.zip
+        unzip -q gradle.zip
         
         # Set environment variables
         export GRADLE_HOME=$PWD/gradle-8.0.2

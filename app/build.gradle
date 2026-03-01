@@ -11,12 +11,6 @@ android {
     compileSdk 34
 
     defaultConfig {
-        allprojects {
-            repositories {
-                mavenCentral()
-                maven { url 'https://jitpack.io' }
-            }
-        }
         applicationId "com.courierearn"
         minSdk 21
         targetSdk 34

@@ -14,17 +14,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
+    - uses: actions/checkout@v3
     - name: Set up JDK 17
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@v3
       with:
         java-version: '17'
         distribution: 'temurin'
         
     - name: Cache Gradle packages
-      uses: actions/cache@v4
+      uses: actions/cache@v3
       with:
         path: |
           ~/.gradle/caches
@@ -51,14 +49,14 @@ jobs:
       run: ./gradlew assembleRelease
 
     - name: Upload Debug APK
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       with:
         name: debug-apk
         path: app/build/outputs/apk/debug/app-debug.apk
         retention-days: 30
 
     - name: Upload Release APK
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       with:
         name: release-apk
         path: app/build/outputs/apk/release/app-release.apk
@@ -71,7 +69,7 @@ jobs:
 
     - name: Create Release
       if: startsWith(github.ref, 'refs/tags/')
-      uses: softprops/action-gh-release@v2
+      uses: softprops/action-gh-release@v1
       with:
         name: CourierEarn v1.0 "Yam" - First Public Release
         body: |

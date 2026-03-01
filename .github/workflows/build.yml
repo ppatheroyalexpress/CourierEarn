@@ -45,10 +45,10 @@ jobs:
         echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> app/keystore.properties
 
     - name: Build Debug APK
-      run: ./gradlew assembleDebug --stacktrace --info --no-daemon
+      run: ./gradlew assembleDebug
 
     - name: Build Release APK
-      run: ./gradlew assembleRelease --stacktrace --info --no-daemon
+      run: ./gradlew assembleRelease
 
     - name: Upload Debug APK
       uses: actions/upload-artifact@v4

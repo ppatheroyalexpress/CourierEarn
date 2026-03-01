@@ -1,7 +1,7 @@
-#!/bin/sh
+#!/usr/bin/env sh
 
 #
-# Copyright © 2015-2021 the original authors.
+# Copyright 2015 the original author or authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -99,7 +99,7 @@ APP_NAME="Gradle"
 APP_BASE_NAME=`basename "$0"`
 
 # Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
-DEFAULT_JVM_OPTS="-Xmx2048m -Xms512m"
+DEFAULT_JVM_OPTS=""
 
 # Use the maximum available, or set MAX_FD != -1 to use that value.
 MAX_FD="maximum"

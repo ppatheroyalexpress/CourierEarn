@@ -29,6 +29,13 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-gradle-
 
+    - name: Download Gradle Wrapper
+      run: |
+        curl -L https://services.gradle.org/distributions/gradle-8.0.2-bin.zip -o gradle-dist.zip
+        unzip gradle-dist.zip gradle-8.0.2/lib/gradle-wrapper-8.0.2.jar
+        cp gradle-8.0.2/lib/gradle-wrapper-8.0.2.jar gradle/wrapper/gradle-wrapper.jar
+        rm -rf gradle-8.0.2 gradle-dist.zip
+
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 

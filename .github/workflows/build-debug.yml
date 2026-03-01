@@ -31,12 +31,34 @@ jobs:
 
     - name: Install Gradle
       run: |
-        wget https://services.gradle.org/distributions/gradle-8.0.2-bin.zip
-        unzip gradle-8.0.2-bin.zip
+        # Download Gradle with retry and timeout
+        wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 -t 5 https://services.gradle.org/distributions/gradle-8.0.2-bin.zip
+        
+        # Validate download
+        if [ ! -f gradle-8.0.2-bin.zip ]; then
+          echo " Gradle download failed - file not found"
+          exit 1
+        fi
+        
+        # Check file size (should be ~90MB for complete download)
+        FILE_SIZE=$(wc -c < gradle-8.0.2-bin.zip)
+        if [ $FILE_SIZE -lt 1000000 ]; then
+          echo " Gradle zip file is too small (corrupted download)"
+          exit 1
+        fi
+        
+        # Extract and setup
+        echo " Gradle downloaded successfully, extracting..."
+        unzip -q gradle-8.0.2-bin.zip
+        
+        # Set environment variables
         export GRADLE_HOME=$PWD/gradle-8.0.2
         export PATH=$GRADLE_HOME/bin:$PATH
         echo "GRADLE_HOME=$GRADLE_HOME" >> $GITHUB_ENV
         echo "$GRADLE_HOME/bin" >> $GITHUB_PATH
+        
+        # Verify Gradle installation
+        gradle --version
 
     - name: Build Debug APK
       run: |

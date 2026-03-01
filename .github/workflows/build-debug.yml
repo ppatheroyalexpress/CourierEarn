@@ -29,18 +29,20 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-gradle-
 
-    - name: Download Gradle Wrapper
+    - name: Install Gradle
       run: |
-        curl -L https://services.gradle.org/distributions/gradle-8.0.2-bin.zip -o gradle-dist.zip
-        unzip gradle-dist.zip gradle-8.0.2/lib/gradle-wrapper-8.0.2.jar
-        cp gradle-8.0.2/lib/gradle-wrapper-8.0.2.jar gradle/wrapper/gradle-wrapper.jar
-        rm -rf gradle-8.0.2 gradle-dist.zip
-
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
+        wget https://services.gradle.org/distributions/gradle-8.0.2-bin.zip
+        unzip gradle-8.0.2-bin.zip
+        export GRADLE_HOME=$PWD/gradle-8.0.2
+        export PATH=$GRADLE_HOME/bin:$PATH
+        echo "GRADLE_HOME=$GRADLE_HOME" >> $GITHUB_ENV
+        echo "$GRADLE_HOME/bin" >> $GITHUB_PATH
 
     - name: Build Debug APK
-      run: ./gradlew assembleDebug
+      run: |
+        export GRADLE_HOME=$PWD/gradle-8.0.2
+        export PATH=$GRADLE_HOME/bin:$PATH
+        gradle assembleDebug
 
     - name: Upload Debug APK
       uses: actions/upload-artifact@v4

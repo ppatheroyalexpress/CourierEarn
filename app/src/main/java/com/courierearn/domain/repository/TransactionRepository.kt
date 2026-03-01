@@ -13,6 +13,9 @@ interface TransactionRepository {
     // Get transaction by specific date
     suspend fun getTransactionByDate(date: LocalDate): Transaction?
     
+    // Get transactions by specific date (returns list for the worker)
+    suspend fun getTransactionsByDate(date: LocalDate): List<Transaction>
+    
     // Get transactions for date range
     fun getTransactionsByDateRange(startDate: LocalDate, endDate: LocalDate): Flow<List<Transaction>>
     

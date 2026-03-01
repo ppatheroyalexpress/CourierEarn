@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.courierearn.domain.model.HomeScreenData
 import com.courierearn.domain.usecase.GetHomeScreenDataUseCase
 import com.courierearn.domain.usecase.SaveTransactionUseCase
+import com.courierearn.printer.PrintResult
+import com.courierearn.printer.ThermalPrinterService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,7 +18,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getHomeScreenDataUseCase: GetHomeScreenDataUseCase,
-    private val saveTransactionUseCase: SaveTransactionUseCase
+    private val saveTransactionUseCase: SaveTransactionUseCase,
+    private val thermalPrinterService: ThermalPrinterService
 ) : ViewModel() {
     
     private val _homeScreenData = MutableStateFlow<HomeScreenData?>(null)
@@ -25,8 +28,14 @@ class HomeViewModel @Inject constructor(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
     
+    private val _isPrinting = MutableStateFlow(false)
+    val isPrinting: StateFlow<Boolean> = _isPrinting.asStateFlow()
+    
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
+    
+    private val _printMessage = MutableStateFlow<String?>(null)
+    val printMessage: StateFlow<String?> = _printMessage.asStateFlow()
     
     init {
         loadHomeScreenData()
@@ -86,7 +95,80 @@ class HomeViewModel @Inject constructor(
         }
     }
     
+    fun printTodayReceipt() {
+        viewModelScope.launch {
+            _isPrinting.value = true
+            _printMessage.value = null
+            _errorMessage.value = null
+            
+            try {
+                val todayTransaction = _homeScreenData.value?.todayTransaction
+                if (todayTransaction == null) {
+                    _errorMessage.value = "No transaction data available for today"
+                    _isPrinting.value = false
+                    return@launch
+                }
+                
+                val result = thermalPrinterService.printTodayReceipt(todayTransaction)
+                
+                when (result) {
+                    is PrintResult.Success -> {
+                        _printMessage.value = "Receipt printed successfully!"
+                    }
+                    is PrintResult.Error -> {
+                        _errorMessage.value = "Printing failed: ${result.message}"
+                    }
+                }
+            } catch (e: Exception) {
+                _errorMessage.value = "Error printing receipt: ${e.message}"
+            } finally {
+                _isPrinting.value = false
+            }
+        }
+    }
+    
+    fun printDailySummary() {
+        viewModelScope.launch {
+            _isPrinting.value = true
+            _printMessage.value = null
+            _errorMessage.value = null
+            
+            try {
+                val todayTransactions = _homeScreenData.value?.todayTransactions ?: emptyList()
+                
+                if (todayTransactions.isEmpty()) {
+                    _errorMessage.value = "No transactions available for today"
+                    _isPrinting.value = false
+                    return@launch
+                }
+                
+                val result = thermalPrinterService.printDailySummary(todayTransactions)
+                
+                when (result) {
+                    is PrintResult.Success -> {
+                        _printMessage.value = "Daily summary printed successfully!"
+                    }
+                    is PrintResult.Error -> {
+                        _errorMessage.value = "Printing failed: ${result.message}"
+                    }
+                }
+            } catch (e: Exception) {
+                _errorMessage.value = "Error printing summary: ${e.message}"
+            } finally {
+                _isPrinting.value = false
+            }
+        }
+    }
+    
+    fun isPrinterConnected(): Boolean {
+        return thermalPrinterService.isPrinterConnected()
+    }
+    
     fun clearError() {
         _errorMessage.value = null
+    }
+    
+    fun clearPrintMessage() {
+        _printMessage.value = null
     }
 }

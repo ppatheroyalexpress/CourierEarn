@@ -15,11 +15,25 @@ android {
         minSdk 21
         targetSdk 34
         versionCode 1
-        versionName "1.0.0"
+        versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary true
+        }
+        
+        // Set output file name for APK
+        setProperty("archivesBaseName", "CourierEarn-v1.0")
+    }
+
+    signingConfigs {
+        release {
+            if (project.hasProperty('keystoreFile')) {
+                storeFile file(project.property('keystoreFile'))
+                storePassword project.property('keystorePassword')
+                keyAlias project.property('keyAlias')
+                keyPassword project.property('keyPassword')
+            }
         }
     }
 
@@ -27,6 +41,7 @@ android {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
         debug {
             minifyEnabled false

@@ -1,0 +1,219 @@
+name: Build and Release APK
+
+on:
+  push:
+    branches: [ main, master ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Cache Gradle packages
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    - name: Create keystore
+      run: |
+        echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > app/release.keystore
+        echo "storeFile=app/release.keystore" >> app/keystore.properties
+        echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" >> app/keystore.properties
+        echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> app/keystore.properties
+        echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> app/keystore.properties
+
+    - name: Build Debug APK
+      run: ./gradlew assembleDebug
+
+    - name: Build Release APK
+      run: ./gradlew assembleRelease
+
+    - name: Upload Debug APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: debug-apk
+        path: app/build/outputs/apk/debug/app-debug.apk
+        retention-days: 30
+
+    - name: Upload Release APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-apk
+        path: app/build/outputs/apk/release/app-release.apk
+        retention-days: 30
+
+    - name: Rename APK files
+      run: |
+        mv app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/CourierEarn-v1.0-debug.apk
+        mv app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/CourierEarn-v1.0.apk
+
+    - name: Create Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v2
+      with:
+        name: CourierEarn v1.0 "Yam" - First Public Release
+        body: |
+          # CourierEarn v1.0 "Yam"
+          
+          Courier Commission Tracker App for couriers to track daily earnings.
+          
+          ## ✨ Features
+          - ✅ Daily Data Entry (Cash Collect 200 MMK, Sender Pay 100 MMK)
+          - ✅ Extra Care (EC) Tracking (600 MMK monthly bonus)
+          - ✅ Monthly Calculation (1st to last day)
+          - ✅ Material Design 3 UI
+          - ✅ Calendar View with color-coded days
+          - ✅ PDF Export (Weekly & Monthly Reports)
+          - ✅ Bluetooth Print (58mm Thermal Printer)
+          - ✅ Daily Reminder (8 PM with WorkManager)
+          - ✅ Offline-first with Room Database
+          - ✅ JSON Backup & Restore
+          
+          ## 📱 Screenshots
+          (Screenshots မရှိသေးရင် ဒီနေရာမှာချန်ထားပါ)
+          
+          ## 📲 Installation
+          1. Download CourierEarn-v1.0.apk
+          2. Enable "Install from unknown sources" in settings
+          3. Open APK and install
+          4. Start tracking your commissions!
+          
+          ## 🛠️ Technical Details
+          - Min SDK: API 21 (Android 5.0+)
+          - Target SDK: API 34
+          - Architecture: MVVM with Clean Architecture
+          - Database: Room
+          - Background: WorkManager
+          - PDF: iText7
+          - Printing: ESC/POS
+          
+          ## ⚠️ Disclaimer
+          This app is for educational purposes only. Not affiliated with Royal Express Co., Ltd. Actual commission may vary based on company SOP.
+          
+          ## 👤 Developer
+          PPA | 30 (Chanmyathazi East Section)
+          
+          ---
+          
+          ## 🚀 First Public Release
+          
+          **Version**: v1.0 "Yam"  
+          **Release Date**: ${{ github.event.head_commit.timestamp }}  
+          **Status**: Production Ready  
+          **Build Type**: Signed Release APK
+          
+          ### 📦 Assets
+          - **CourierEarn-v1.0.apk** (Signed Release Build)
+          - **CourierEarn-v1.0-debug.apk** (Debug Build for testing)
+          
+          ### 📋 System Requirements
+          - Android 5.0 (API 21) or higher
+          - 2GB RAM minimum
+          - Bluetooth 4.0+ for printing
+          - External storage access for exports
+          
+          ### 🔐 Permissions Required
+          - Bluetooth & Location (for printer)
+          - Storage (for PDF export)
+          - Notifications (for daily reminders)
+          
+          ### 📝 Changelog
+          **v1.0 "Yam"** - First Public Release
+          - Initial release with all core features
+          - Daily commission tracking
+          - PDF export functionality
+          - Bluetooth thermal printer support
+          - Daily reminder system
+          - Calendar view with data visualization
+          - Backup and restore functionality
+          
+          ---
+          
+          **Thank you for using CourierEarn! 🚚💨**
+          
+          *"Yam" - အားရမှု၊ စည်းစည်းလုံးလုံးဖြင့်အလုပ်လုပ်ခြင်း*
+        files: |
+          app/build/outputs/apk/release/CourierEarn-v1.0.apk
+          app/build/outputs/apk/debug/CourierEarn-v1.0-debug.apk
+        draft: false
+        prerelease: false
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Get APK info
+      run: |
+        echo "=== APK Information ==="
+        echo "Debug APK Size: $(du -h app/build/outputs/apk/debug/CourierEarn-v1.0-debug.apk | cut -f1)"
+        echo "Release APK Size: $(du -h app/build/outputs/apk/release/CourierEarn-v1.0.apk | cut -f1)"
+        echo "Build Date: $(date)"
+        echo "Commit: ${{ github.sha }}"
+        echo "Branch: ${{ github.ref_name }}"
+
+    - name: Comment on PR
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const debugSize = fs.statSync('app/build/outputs/apk/debug/CourierEarn-v1.0-debug.apk').size;
+          const releaseSize = fs.statSync('app/build/outputs/apk/release/CourierEarn-v1.0.apk').size;
+          
+          const comment = `
+          ## 🚀 Build Successful!
+          
+          ### 📦 APK Files Ready
+          - **Debug APK**: ${(debugSize / 1024 / 1024).toFixed(2)} MB
+          - **Release APK**: ${(releaseSize / 1024 / 1024).toFixed(2)} MB
+          
+          ### 📥 Download
+          Download APK files from the "Artifacts" section below.
+          
+          ### 🔗 Actions
+          - [View Artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          - [View Build Log](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          
+          ---
+          Build completed in ${{ job.status }} ✅
+          `;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
+
+  notify:
+    needs: build
+    runs-on: ubuntu-latest
+    if: always() && startsWith(github.ref, 'refs/tags/')
+    
+    steps:
+    - name: Notify Release
+      run: |
+        echo "🎉 CourierEarn v1.0 'Yam' has been released!"
+        echo "📱 APK is available for download"
+        echo "🔗 Release URL: https://github.com/${{ github.repository }}/releases/tag/v1.0"

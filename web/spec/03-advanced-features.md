@@ -54,12 +54,12 @@
   - Manual curl tests: auth enforced (returns 401 without session)
 - [x] Configure Vercel deployment
   - Next.js app ready; use default Vercel Next.js settings
-- [x] Set up custom domain: courierearn.vercel.app
-  - Configure on Vercel dashboard -> Domains -> Add `courierearn.vercel.app`
+- [x] Set up custom domain: courier-earn.vercel.app
+- Configure on Vercel dashboard -> Domains -> Add `courier-earn.vercel.app`
 - [x] Create deployment documentation
-  - Steps:
-    - Push repository to GitHub
-    - Import project in Vercel, link to [courierearn-web](file:///D:/MY%20TECH%20JOURNEY%202026/PROJECTS/CourierEarn/web/frontend/courierearn-web)
-    - Set env: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-    - Enable production builds; add custom domain `courierearn.vercel.app`
-    - Verify API routes via Vercel preview/production
+- [x] Steps:
+  - [x] Push repository to GitHub
+  - [x] Import project in Vercel, link to [courierearn-web](file:///D:/MY%20TECH%20JOURNEY%202026/PROJECTS/CourierEarn/web/frontend/courierearn-web)
+  - [x] Set env: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+  - [x] Enable production builds; add custom domain `courier-earn.vercel.app`
+  - [x] Verify API routes via Vercel preview/production

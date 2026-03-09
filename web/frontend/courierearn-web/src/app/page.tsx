@@ -60,7 +60,7 @@ export default async function Home() {
       </main>
       
       <footer className="p-8 text-center text-zinc-400 text-sm border-t dark:border-zinc-900">
-        &copy; {new Date().getFullYear()} CourierEarn. Built for Couriers.
+        &copy; {new Date().getFullYear()} CourierEarn. Built for CATZ (E) Couriers.
       </footer>
     </div>
   );

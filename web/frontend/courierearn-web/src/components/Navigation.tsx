@@ -17,6 +17,7 @@ export default function Navigation() {
     { label: 'Dashboard', href: '/dashboard', icon: '📊' },
     { label: 'Delivery', href: '/delivery', icon: '🚚' },
     { label: 'Pickup', href: '/pickup', icon: '📦' },
+    { label: 'KPI', href: '/kpi', icon: '🏆' },
     { label: 'Profile', href: '/profile', icon: '👤' },
   ]
 
@@ -32,11 +33,10 @@ export default function Navigation() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-all ${
-                  pathname === item.href
-                    ? 'bg-zinc-100 text-black dark:bg-zinc-800 dark:text-white'
-                    : 'text-zinc-600 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-zinc-900'
-                }`}
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-all ${pathname === item.href
+                  ? 'bg-zinc-100 text-black dark:bg-zinc-800 dark:text-white'
+                  : 'text-zinc-600 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-zinc-900'
+                  }`}
               >
                 {item.label}
               </Link>
@@ -56,11 +56,10 @@ export default function Navigation() {
           <Link
             key={item.href}
             href={item.href}
-            className={`flex flex-col items-center gap-1 transition-all ${
-              pathname === item.href
-                ? 'text-black dark:text-white scale-110'
-                : 'text-zinc-400'
-            }`}
+            className={`flex flex-col items-center gap-1 transition-all ${pathname === item.href
+              ? 'text-black dark:text-white scale-110'
+              : 'text-zinc-400'
+              }`}
           >
             <span className="text-xl">{item.icon}</span>
             <span className="text-[10px] font-bold uppercase tracking-wider">{item.label}</span>

@@ -125,8 +125,8 @@ export default function ProfilePage() {
     return (
       <main className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-black p-6 text-center">
         <div>
-           <p className="text-zinc-500 mb-4">You need to sign in to view your profile.</p>
-           <Link href="/login" className="px-4 py-2 bg-black text-white rounded-xl font-bold">Sign In</Link>
+          <p className="text-zinc-500 mb-4">You need to sign in to view your profile.</p>
+          <Link href="/login" className="px-4 py-2 bg-black text-white rounded-xl font-bold">Sign In</Link>
         </div>
       </main>
     );
@@ -136,8 +136,8 @@ export default function ProfilePage() {
     <main className="min-h-screen bg-zinc-50 dark:bg-black p-4 md:p-8">
       <div className="max-w-xl mx-auto">
         <header className="flex justify-between items-center mb-10">
-          <Link 
-            href="/dashboard" 
+          <Link
+            href="/dashboard"
             className="w-10 h-10 flex items-center justify-center rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm hover:bg-zinc-50 transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -175,13 +175,13 @@ export default function ProfilePage() {
               ref={fileInputRef}
               onChange={onAvatarChange}
             />
-            <button 
+            <button
               onClick={() => fileInputRef.current?.click()}
               className="px-4 py-2 text-xs font-bold rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-50 transition-colors"
             >
               Upload
             </button>
-            <button 
+            <button
               onClick={removeAvatar}
               className="px-4 py-2 text-xs font-bold rounded-xl border border-red-100 dark:border-red-900/30 text-red-500 bg-red-50/50 dark:bg-red-900/10 hover:bg-red-50 transition-colors"
             >
@@ -205,24 +205,29 @@ export default function ProfilePage() {
 
           <div>
             <label className="text-xs font-black uppercase tracking-widest text-zinc-400 mb-2 block">Email Address</label>
-            <input 
-              className="w-full px-0 py-1 text-zinc-500 bg-transparent focus:outline-none cursor-not-allowed" 
-              value={authEmail ?? ""} 
-              readOnly 
+            <input
+              className="w-full px-0 py-1 text-zinc-500 bg-transparent focus:outline-none cursor-not-allowed"
+              value={authEmail ?? ""}
+              readOnly
             />
           </div>
 
           <div className="grid grid-cols-2 gap-8 pt-4">
             <div>
               <label className="text-xs font-black uppercase tracking-widest text-zinc-400 mb-2 block">Branch</label>
-              <input
-                className="w-full px-0 py-1 font-bold bg-transparent border-b border-transparent focus:border-zinc-200 focus:outline-none placeholder:text-zinc-300"
-                value={profile?.branch ?? ""}
-                placeholder="e.g. downtown"
+              <select
+                className="w-full px-0 py-1 font-bold bg-transparent border-b border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-black dark:focus:border-white appearance-none cursor-pointer"
+                value={profile?.branch?.toUpperCase() ?? "A"}
                 onChange={(e) =>
                   setProfile((p) => (p ? { ...p, branch: e.target.value.toLowerCase() } : p))
                 }
-              />
+              >
+                {['A', 'B', 'C', 'D', 'E'].map(b => (
+                  <option key={b} value={b} className="bg-white dark:bg-zinc-900">
+                    ရုံးခွဲ {b}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="text-xs font-black uppercase tracking-widest text-zinc-400 mb-2 block">Phone</label>

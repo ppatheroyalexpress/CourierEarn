@@ -214,7 +214,7 @@ export default function ProfilePage() {
 
           <div className="grid grid-cols-2 gap-8 pt-4">
             <div>
-              <label className="text-xs font-black uppercase tracking-widest text-zinc-400 mb-2 block">Branch</label>
+              <label className="text-xs font-black uppercase tracking-widest text-zinc-400 mb-2 block">Branch Hierarchy</label>
               <select
                 className="w-full px-0 py-1 font-bold bg-transparent border-b border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-black dark:focus:border-white appearance-none cursor-pointer"
                 value={profile?.branch?.toUpperCase() ?? "A"}
@@ -224,7 +224,7 @@ export default function ProfilePage() {
               >
                 {['A', 'B', 'C', 'D', 'E'].map(b => (
                   <option key={b} value={b} className="bg-white dark:bg-zinc-900">
-                    ရုံးခွဲ {b}
+                    {b}
                   </option>
                 ))}
               </select>

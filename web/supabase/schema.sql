@@ -50,3 +50,26 @@ create table if not exists public.sessions (
 );
 create index if not exists idx_sessions_user_id on public.sessions(user_id);
 create index if not exists idx_sessions_expires_at on public.sessions(expires_at);
+
+create table if not exists public.kpi_grades (
+  id uuid primary key default gen_random_uuid(),
+  branch text not null,
+  grade integer not null,
+  monthly_ll_point numeric(10,1) not null,
+  created_at timestamp with time zone default now(),
+  unique(branch, grade)
+);
+create index if not exists idx_kpi_grades_branch on public.kpi_grades(branch);
+
+create table if not exists public.monthly_kpi (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references public.users(id) on delete cascade,
+  year integer not null,
+  month integer not null,
+  total_points numeric(10,1) not null default 0,
+  grade integer not null default 5,
+  created_at timestamp with time zone default now(),
+  updated_at timestamp with time zone default now(),
+  unique(user_id, year, month)
+);
+create index if not exists idx_monthly_kpi_user_year_month on public.monthly_kpi(user_id, year, month);

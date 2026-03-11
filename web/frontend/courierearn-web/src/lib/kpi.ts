@@ -25,15 +25,18 @@ export function applyWarningPenalty(currentGrade: number, warningCount: number):
   return Math.max(1, currentGrade - warningCount);
 }
 
-// Keep the old ones for compatibility if needed, but the user requested a specific update
+// Keep the old ones for compatibility if needed, but updated to match spec
 export function computePickupKpiFromNotes(notes: string | null): number {
   const txt = String(notes || "");
   const houses = Number(txt.match(/houses=(\d+)/)?.[1] ?? 0);
   const parcels = Number(txt.match(/parcels=(\d+)/)?.[1] ?? 0);
-  return houses + parcels * 0.1;
+  // Pickup House: 1 point each, Pickup Parcel: 0.1 point each
+  return houses + (parcels * 0.1);
 }
 
 export function computeDeliveryKpiFromAmount(amount: number | null | undefined): number {
+  // For transactions, amount represents the total waybills
+  // Each waybill (whether Cash Collect, Not Cash Collect, or EC) = 1 point
   const v = Number(amount || 0);
   return isNaN(v) ? 0 : v;
 }

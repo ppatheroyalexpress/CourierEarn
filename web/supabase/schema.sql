@@ -4,6 +4,7 @@ create table if not exists public.users (
   id uuid primary key default gen_random_uuid(),
   auth_user_id uuid unique not null,
   email text unique,
+  username text,
   full_name text,
   avatar_url text,
   branch text,

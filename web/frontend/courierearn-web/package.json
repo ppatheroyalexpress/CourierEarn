@@ -1,5 +1,5 @@
 {
-  "name": "courierearn-web",
+  "name": "@courierearn/web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -10,6 +10,8 @@
     "test:kpi": "node scripts/kpi.test.js"
   },
   "dependencies": {
+    "@courierearn/shared": "*",
+    "@courierearn/ui": "*",
     "@supabase/ssr": "^0.9.0",
     "@supabase/supabase-js": "^2.98.0",
     "@types/dotenv": "^6.1.1",

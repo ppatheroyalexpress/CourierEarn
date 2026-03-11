@@ -59,6 +59,8 @@ export default function PickupEntryPage() {
         user_id: userRowId,
         scheduled_at: new Date(date).toISOString(),
         location: "daily-pickup",
+        houses: houses,
+        parcels: parcels,
         notes: `houses=${houses};parcels=${parcels}`,
       });
       if (error) {

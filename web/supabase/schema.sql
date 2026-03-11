@@ -17,6 +17,9 @@ create table if not exists public.transactions (
   pickup_location text not null,
   dropoff_location text not null,
   amount numeric(10,2) not null,
+  cash_collect integer default 0,
+  not_cash integer default 0,
+  ec integer default 0,
   status text check (status in ('pending','in_transit','delivered','cancelled')) default 'pending',
   created_at timestamp with time zone default now(),
   delivered_at timestamp with time zone
@@ -30,6 +33,8 @@ create table if not exists public.pickups (
   scheduled_at timestamp with time zone not null,
   location text not null,
   notes text,
+  houses integer default 0,
+  parcels integer default 0,
   created_at timestamp with time zone default now()
 );
 create index if not exists idx_pickups_user_id on public.pickups(user_id);

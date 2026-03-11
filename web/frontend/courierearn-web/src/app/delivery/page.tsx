@@ -61,6 +61,9 @@ export default function DeliveryEntryPage() {
         pickup_location: "daily-delivery",
         dropoff_location: date,
         amount: total,
+        cash_collect: cashCollect,
+        not_cash: notCashCollect,
+        ec: ec,
         status: "delivered",
         delivered_at: new Date(date).toISOString(),
       });

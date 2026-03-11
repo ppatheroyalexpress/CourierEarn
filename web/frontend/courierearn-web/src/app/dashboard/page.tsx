@@ -18,6 +18,11 @@ export default function DashboardPage() {
     todayCommission: 0,
     todayPickupTotal: 0,
     todayDeliveryTotal: 0,
+    todayCashCollect: 0,
+    todayNotCashCollect: 0,
+    todayEc: 0,
+    todayHouses: 0,
+    todayParcels: 0,
     mtdEarnings: 0,
     mtdEc: 0,
   })
@@ -93,35 +98,41 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="space-y-6">
+          {/* Today's Commission - Full Width */}
           <div className="p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-center shadow-sm hover:shadow-md transition-shadow">
             <div className="text-xs font-bold uppercase tracking-widest text-zinc-400 mb-2">{"Today's Commission"}</div>
             <div className="text-4xl font-black text-black dark:text-white">{summary.todayCommission.toFixed(2)}</div>
           </div>
           
-          <div className="p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-center shadow-sm hover:shadow-md transition-shadow">
-            <div className="text-xs font-bold uppercase tracking-widest text-zinc-400 mb-2">{"Today's Pickup"}</div>
-            <div className="text-4xl font-black text-black dark:text-white">{summary.todayPickupTotal}</div>
-          </div>
-          
-          <div className="p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-center shadow-sm hover:shadow-md transition-shadow">
-            <div className="text-xs font-bold uppercase tracking-widest text-zinc-400 mb-2">{"Today's Delivery"}</div>
-            <div className="text-4xl font-black text-black dark:text-white">{summary.todayDeliveryTotal}</div>
+          {/* Today's Delivery and Today's Pickup - Side by side */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-center shadow-sm hover:shadow-md transition-shadow">
+              <div className="text-xs font-bold uppercase tracking-widest text-zinc-400 mb-2">{"Today's Delivery"}</div>
+              <div className="text-4xl font-black text-black dark:text-white">{summary.todayCashCollect} ({summary.todayNotCashCollect})</div>
+              <div className="text-xs font-medium text-zinc-500 dark:text-zinc-400 mt-1">Cash (Not Cash)</div>
+            </div>
+            
+            <div className="p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-center shadow-sm hover:shadow-md transition-shadow">
+              <div className="text-xs font-bold uppercase tracking-widest text-zinc-400 mb-2">{"Today's Pickup"}</div>
+              <div className="text-4xl font-black text-black dark:text-white">{summary.todayHouses} ({summary.todayParcels})</div>
+              <div className="text-xs font-medium text-zinc-500 dark:text-zinc-400 mt-1">Houses (Parcels)</div>
+            </div>
           </div>
 
-          <div className="p-8 rounded-3xl bg-black dark:bg-white text-center shadow-lg shadow-black/10 transition-transform hover:scale-[1.02]">
-            <div className="text-xs font-bold uppercase tracking-widest text-zinc-400 mb-2">MTD Earnings</div>
-            <div className="text-4xl font-black text-white dark:text-black">{summary.mtdEarnings.toFixed(2)}</div>
-          </div>
-        </div>
+          {/* MTD Earnings and Month to Date EC - Side by side */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="p-8 rounded-3xl bg-black dark:bg-white text-center shadow-lg shadow-black/10 transition-transform hover:scale-[1.02]">
+              <div className="text-xs font-bold uppercase tracking-widest text-zinc-400 mb-2">MTD Earnings</div>
+              <div className="text-4xl font-black text-white dark:text-black">{summary.mtdEarnings.toFixed(2)}</div>
+              <div className="text-xs font-medium text-zinc-300 dark:text-zinc-600 mt-1">MMK</div>
+            </div>
 
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-center shadow-sm">
-             <div className="text-xs font-bold uppercase tracking-widest text-zinc-400 mb-2">Month to Date EC</div>
-             <div className="text-3xl font-bold text-black dark:text-white">{summary.mtdEc} <span className="text-sm font-normal text-zinc-500">entries</span></div>
-          </div>
-          <div className="p-8 rounded-3xl bg-zinc-100 dark:bg-zinc-800 border border-transparent text-center flex items-center justify-center">
-             <p className="text-zinc-500 dark:text-zinc-400 text-sm italic">Keep up the great work!</p>
+            <div className="p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-center shadow-sm hover:shadow-md transition-shadow">
+              <div className="text-xs font-bold uppercase tracking-widest text-zinc-400 mb-2">Month to Date EC</div>
+              <div className="text-4xl font-black text-black dark:text-white">{summary.mtdEc}</div>
+              <div className="text-xs font-medium text-zinc-500 dark:text-zinc-400 mt-1">pcs</div>
+            </div>
           </div>
         </div>
       </div>

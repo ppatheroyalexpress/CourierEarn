@@ -18,6 +18,7 @@ export default function Navigation() {
     { label: 'Delivery', href: '/delivery', icon: '🚚' },
     { label: 'Pickup', href: '/pickup', icon: '📦' },
     { label: 'KPI', href: '/kpi', icon: '🏆' },
+    { label: 'Leaderboard', href: '/leaderboard', icon: '🥇' },
     { label: 'Profile', href: '/profile', icon: '👤' },
   ]
 

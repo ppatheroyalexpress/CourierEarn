@@ -73,3 +73,14 @@ create table if not exists public.monthly_kpi (
   unique(user_id, year, month)
 );
 create index if not exists idx_monthly_kpi_user_year_month on public.monthly_kpi(user_id, year, month);
+
+create table if not exists public.user_warnings (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references public.users(id) on delete cascade,
+  warning_date date not null,
+  warning_count integer not null default 1,
+  reason text,
+  created_at timestamp with time zone default now(),
+  unique(user_id, warning_date)
+);
+create index if not exists idx_user_warnings_user_date on public.user_warnings(user_id, warning_date);

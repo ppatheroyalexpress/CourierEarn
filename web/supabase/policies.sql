@@ -4,6 +4,7 @@ alter table public.pickups enable row level security;
 alter table public.sessions enable row level security;
 alter table public.kpi_grades enable row level security;
 alter table public.monthly_kpi enable row level security;
+alter table public.user_warnings enable row level security;
 
 create or replace function public.current_auth_user_id() returns uuid
 language sql stable
@@ -95,3 +96,19 @@ create policy if not exists "Monthly KPI insertable by system"
 on public.monthly_kpi
 for insert
 with check (auth.role() = 'service_role');
+
+-- User Warnings policies
+create policy if not exists "User Warnings viewable by owner"
+on public.user_warnings
+for select
+using (user_id in (select id from public.users where auth_user_id = auth.uid()));
+
+create policy if not exists "User Warnings updatable by owner"
+on public.user_warnings
+for update
+using (user_id in (select id from public.users where auth_user_id = auth.uid()));
+
+create policy if not exists "User Warnings insertable by owner"
+on public.user_warnings
+for insert
+with check (user_id in (select id from public.users where auth_user_id = auth.uid()));

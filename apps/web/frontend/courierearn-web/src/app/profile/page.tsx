@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState, useRef } from "react";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import Link from "next/link";
+import { Settings, Info, Upload, Trash2, TrendingUp, Award } from "lucide-react";
 
 type Profile = {
   id: string;
@@ -11,6 +12,8 @@ type Profile = {
   avatar_url: string | null;
   branch: string | null;
   phone: string | null;
+  total_earnings?: number;
+  total_kpi_points?: number;
 };
 
 export default function ProfilePage() {
@@ -42,31 +45,45 @@ export default function ProfilePage() {
         setProfile(p);
         setAvatarPreview(p?.avatar_url ?? null);
 
-        const { data: txSum } = await supabase
-          .from("transactions")
-          .select("amount")
-          .eq("user_id", p?.id ?? "")
-          .eq("pickup_location", "daily-delivery");
-        const earnings =
-          ((txSum ?? []) as Array<{ amount: number }>).reduce(
-            (acc, cur) => acc + Number(cur.amount || 0),
-            0
-          ) || 0;
+        // Use stored totals or calculate if not available
+        const earnings = p?.total_earnings || 0;
+        const kpiPoints = p?.total_kpi_points || 0;
+        
         setTotalEarnings(earnings);
+        setKpi(kpiPoints);
 
-        const { data: pickups } = await supabase
-          .from("pickups")
-          .select("notes")
-          .eq("user_id", p?.id ?? "")
-          .eq("location", "daily-pickup");
-        const pickupKpi = ((pickups ?? []) as Array<{ notes: string | null }>).reduce((acc, cur) => {
-          const notes = String(cur.notes || "");
-          const houses = Number(notes.match(/houses=(\d+)/)?.[1] ?? 0);
-          const parcels = Number(notes.match(/parcels=(\d+)/)?.[1] ?? 0);
-          return acc + houses + parcels * 0.1;
-        }, 0);
-        const txCount = (txSum ?? []).length;
-        setKpi(txCount + pickupKpi);
+        // If totals are not stored, calculate and update them
+        if (!p?.total_earnings || !p?.total_kpi_points) {
+          // Calculate earnings using new commission formula
+          const { data: txData } = await supabase
+            .from("transactions")
+            .select("cash_collect, not_cash")
+            .eq("user_id", p?.id ?? "");
+          
+          const { data: pickupData } = await supabase
+            .from("pickups")
+            .select("parcels")
+            .eq("user_id", p?.id ?? "");
+
+          const cashTotal = (txData || []).reduce((sum, t) => sum + (t.cash_collect || 0), 0);
+          const notCashTotal = (txData || []).reduce((sum, t) => sum + (t.not_cash || 0), 0);
+          const parcelsTotal = (pickupData || []).reduce((sum, p) => sum + (p.parcels || 0), 0);
+          
+          const calculatedEarnings = (cashTotal * 200) + (notCashTotal * 100) + (parcelsTotal * 50);
+          const calculatedKpi = (txData || []).length + (pickupData || []).length;
+
+          // Update user totals
+          await supabase
+            .from("users")
+            .update({
+              total_earnings: calculatedEarnings,
+              total_kpi_points: calculatedKpi
+            })
+            .eq("id", p?.id);
+
+          setTotalEarnings(calculatedEarnings);
+          setKpi(calculatedKpi);
+        }
       }
       setLoading(false);
     })();
@@ -134,8 +151,9 @@ export default function ProfilePage() {
 
   return (
     <main className="min-h-screen bg-zinc-50 dark:bg-black p-4 md:p-8">
-      <div className="max-w-xl mx-auto">
-        <header className="flex justify-between items-center mb-10">
+      <div className="max-w-md mx-auto">
+        {/* Header */}
+        <header className="flex justify-between items-center mb-8">
           <Link
             href="/dashboard"
             className="w-10 h-10 flex items-center justify-center rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm hover:bg-zinc-50 transition-colors"
@@ -144,114 +162,145 @@ export default function ProfilePage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </Link>
-          <h1 className="text-xl font-bold">Your Profile</h1>
-          <button
-            onClick={saveProfile}
-            disabled={saving}
-            className="px-4 py-2 rounded-xl bg-black dark:bg-white text-white dark:text-black font-bold text-sm shadow-lg shadow-black/10 disabled:opacity-50 hover:scale-105 transition-transform"
-          >
-            {saving ? "Saving…" : "Edit"}
-          </button>
+          <h1 className="text-2xl font-bold">Profile</h1>
+          <div className="w-10 h-10" />
         </header>
 
-        <div className="flex flex-col items-center mb-10">
+        {/* Avatar Section */}
+        <div className="flex flex-col items-center mb-8">
           <div className="relative group">
-            <div className="w-32 h-32 rounded-full border-4 border-white dark:border-zinc-900 overflow-hidden shadow-xl bg-zinc-200 dark:bg-zinc-800">
+            <div className="w-24 h-24 rounded-full border-4 border-white dark:border-zinc-900 overflow-hidden shadow-xl bg-zinc-200 dark:bg-zinc-800">
               {avatarPreview ? (
-                // eslint-disable-next-line @next/next/no-img-element
                 <img src={avatarPreview} alt="Avatar" className="w-full h-full object-cover" />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-4xl font-black text-zinc-400">
+                <div className="w-full h-full flex items-center justify-center text-3xl font-black text-zinc-400">
                   {profile?.full_name?.[0]?.toUpperCase() || "C"}
                 </div>
               )}
             </div>
+            <div className="absolute -bottom-2 -right-2 flex gap-1">
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center shadow-lg hover:bg-blue-600 transition-colors"
+                title="Upload Avatar"
+              >
+                <Upload className="w-4 h-4" />
+              </button>
+              {avatarPreview && (
+                <button
+                  onClick={removeAvatar}
+                  className="w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center shadow-lg hover:bg-red-600 transition-colors"
+                  title="Remove Avatar"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              )}
+            </div>
           </div>
-          <div className="mt-6 flex gap-3">
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              ref={fileInputRef}
-              onChange={onAvatarChange}
-            />
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="px-4 py-2 text-xs font-bold rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-50 transition-colors"
-            >
-              Upload
-            </button>
-            <button
-              onClick={removeAvatar}
-              className="px-4 py-2 text-xs font-bold rounded-xl border border-red-100 dark:border-red-900/30 text-red-500 bg-red-50/50 dark:bg-red-900/10 hover:bg-red-50 transition-colors"
-            >
-              Remove
-            </button>
-          </div>
+          <input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            ref={fileInputRef}
+            onChange={onAvatarChange}
+          />
         </div>
 
-        <div className="space-y-6 bg-white dark:bg-zinc-900 p-8 rounded-[2rem] border border-zinc-200 dark:border-zinc-800 shadow-sm mb-8">
-          <div>
-            <label className="text-xs font-black uppercase tracking-widest text-zinc-400 mb-2 block">Username</label>
-            <input
-              className="w-full px-0 py-1 text-xl font-bold bg-transparent border-b border-transparent focus:border-zinc-200 focus:outline-none placeholder:text-zinc-300"
-              value={profile?.full_name ?? ""}
-              placeholder="e.g. ppa | 30"
-              onChange={(e) =>
-                setProfile((p) => (p ? { ...p, full_name: e.target.value.toLowerCase() } : p))
-              }
-            />
-          </div>
-
-          <div>
-            <label className="text-xs font-black uppercase tracking-widest text-zinc-400 mb-2 block">Email Address</label>
-            <input
-              className="w-full px-0 py-1 text-zinc-500 bg-transparent focus:outline-none cursor-not-allowed"
-              value={authEmail ?? ""}
-              readOnly
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-8 pt-4">
+        {/* User Info */}
+        <div className="bg-white dark:bg-zinc-900 rounded-[2rem] p-6 mb-6 shadow-sm border border-zinc-200 dark:border-zinc-800">
+          <div className="space-y-4">
             <div>
-              <label className="text-xs font-black uppercase tracking-widest text-zinc-400 mb-2 block">Branch Hierarchy</label>
-              <select
-                className="w-full px-0 py-1 font-bold bg-transparent border-b border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-black dark:focus:border-white appearance-none cursor-pointer"
-                value={profile?.branch?.toUpperCase() ?? "A"}
+              <input
+                className="w-full text-2xl font-bold bg-transparent border-none focus:outline-none placeholder:text-zinc-400 text-center"
+                value={profile?.full_name || ""}
+                placeholder="Username"
                 onChange={(e) =>
-                  setProfile((p) => (p ? { ...p, branch: e.target.value.toLowerCase() } : p))
+                  setProfile((p) => (p ? { ...p, full_name: e.target.value.toLowerCase() } : p))
                 }
-              >
-                {['A', 'B', 'C', 'D', 'E'].map(b => (
-                  <option key={b} value={b} className="bg-white dark:bg-zinc-900">
-                    {b}
-                  </option>
-                ))}
-              </select>
+              />
             </div>
             <div>
-              <label className="text-xs font-black uppercase tracking-widest text-zinc-400 mb-2 block">Phone</label>
               <input
-                className="w-full px-0 py-1 font-bold bg-transparent border-b border-transparent focus:border-zinc-200 focus:outline-none placeholder:text-zinc-300"
-                value={profile?.phone ?? ""}
-                placeholder="e.g. 09..."
+                className="w-full text-zinc-500 bg-transparent border-none focus:outline-none text-center"
+                value={authEmail || ""}
+                readOnly
+              />
+            </div>
+            <div>
+              <input
+                className="w-full text-zinc-600 bg-transparent border-none focus:outline-none text-center placeholder:text-zinc-400"
+                value={profile?.phone || ""}
+                placeholder="Phone Number"
                 onChange={(e) =>
-                  setProfile((p) => (p ? { ...p, phone: e.target.value.toLowerCase() } : p))
+                  setProfile((p) => (p ? { ...p, phone: e.target.value } : p))
                 }
               />
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="p-6 rounded-[2rem] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-center shadow-sm">
-            <div className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-1">Total Earnings</div>
-            <div className="text-2xl font-black text-black dark:text-white">{totalEarnings.toFixed(2)}</div>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 gap-4 mb-8">
+          <div className="bg-gradient-to-br from-green-400 to-green-600 rounded-[1.5rem] p-4 text-white shadow-lg">
+            <div className="flex items-center justify-center mb-2">
+              <TrendingUp className="w-6 h-6" />
+            </div>
+            <div className="text-xs font-medium opacity-90 text-center">Total Earnings</div>
+            <div className="text-xl font-black text-center">MMK {totalEarnings.toLocaleString()}</div>
           </div>
-          <div className="p-6 rounded-[2rem] bg-black dark:bg-white text-center shadow-lg shadow-black/10">
-            <div className="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-1">KPI Points</div>
-            <div className="text-2xl font-black text-white dark:text-black">{kpi.toFixed(1)}</div>
+          <div className="bg-gradient-to-br from-purple-400 to-purple-600 rounded-[1.5rem] p-4 text-white shadow-lg">
+            <div className="flex items-center justify-center mb-2">
+              <Award className="w-6 h-6" />
+            </div>
+            <div className="text-xs font-medium opacity-90 text-center">KPI Points</div>
+            <div className="text-xl font-black text-center">{kpi.toFixed(1)}</div>
           </div>
+        </div>
+
+        {/* Navigation Links */}
+        <div className="space-y-3">
+          <Link
+            href="/settings"
+            className="flex items-center justify-between p-4 bg-white dark:bg-zinc-900 rounded-[1.5rem] shadow-sm border border-zinc-200 dark:border-zinc-800 hover:shadow-md transition-shadow"
+          >
+            <div className="flex items-center space-x-3">
+              <Settings className="w-5 h-5 text-zinc-600 dark:text-zinc-400" />
+              <span className="font-medium">Settings</span>
+            </div>
+            <svg className="w-5 h-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
+          
+          <Link
+            href="/about"
+            className="flex items-center justify-between p-4 bg-white dark:bg-zinc-900 rounded-[1.5rem] shadow-sm border border-zinc-200 dark:border-zinc-800 hover:shadow-md transition-shadow"
+          >
+            <div className="flex items-center space-x-3">
+              <Info className="w-5 h-5 text-zinc-600 dark:text-zinc-400" />
+              <span className="font-medium">About</span>
+            </div>
+            <svg className="w-5 h-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
+        </div>
+
+        {/* Version Info */}
+        <div className="mt-8 text-center">
+          <div className="text-xs text-zinc-500 font-medium">Version v1.0 "Yam"</div>
+          <div className="text-xs text-zinc-400 mt-1">CourierEarn KPI Engine</div>
+        </div>
+
+        {/* Save Button */}
+        <div className="mt-8">
+          <button
+            onClick={saveProfile}
+            disabled={saving}
+            className="w-full py-3 rounded-[1.5rem] bg-black dark:bg-white text-white dark:text-black font-bold shadow-lg shadow-black/10 disabled:opacity-50 hover:scale-[1.02] transition-transform"
+          >
+            {saving ? "Saving..." : "Save Profile"}
+          </button>
         </div>
       </div>
     </main>

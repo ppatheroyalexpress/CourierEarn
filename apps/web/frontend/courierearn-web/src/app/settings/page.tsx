@@ -2,12 +2,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import Link from "next/link";
+import { AlertTriangle, RefreshCw } from "lucide-react";
 
 export default function SettingsPage() {
     const supabase = useMemo(() => getSupabaseBrowserClient(), []);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [resettingWarnings, setResettingWarnings] = useState(false);
     const [profile, setProfile] = useState<{ id: string; branch: string } | null>(null);
+    const [warningCount, setWarningCount] = useState(0);
 
     useEffect(() => {
         async function fetchProfile() {
@@ -23,6 +26,15 @@ export default function SettingsPage() {
                         id: rows[0].id,
                         branch: rows[0].branch || 'A'
                     });
+
+                    // Fetch warning count
+                    const { data: warnings } = await supabase
+                        .from("user_warnings")
+                        .select("id")
+                        .eq("user_id", rows[0].id)
+                        .eq("is_active", true);
+                    
+                    setWarningCount(warnings?.length || 0);
                 }
             }
             setLoading(false);
@@ -47,6 +59,39 @@ export default function SettingsPage() {
             alert("Failed to save branch");
         } finally {
             setSaving(false);
+        }
+    };
+
+    const resetWarnings = async () => {
+        if (!profile) return;
+        if (!confirm("Are you sure you want to reset all your warnings? This action cannot be undone.")) {
+            return;
+        }
+        
+        setResettingWarnings(true);
+        try {
+            const response = await fetch('/api/warnings', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    targetUserId: profile.id
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to reset warnings');
+            }
+
+            const result = await response.json();
+            setWarningCount(0);
+            alert(`Successfully reset ${result.resetCount} warnings!`);
+        } catch (err) {
+            console.error("Error resetting warnings:", err);
+            alert("Failed to reset warnings");
+        } finally {
+            setResettingWarnings(false);
         }
     };
 
@@ -98,6 +143,43 @@ export default function SettingsPage() {
                             </div>
                             <p className="mt-6 text-sm text-zinc-500 font-medium bg-zinc-50 dark:bg-zinc-800/50 p-4 rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-700">
                                 Note: Your KPI targets and grade thresholds are determined by your branch assignment. Changing this will update your monthly goals immediately.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="mb-10">
+                        <h2 className="text-sm font-black uppercase tracking-[0.2em] text-zinc-400 mb-6 flex items-center gap-3">
+                            <span className="w-8 h-[2px] bg-black dark:bg-white rounded-full"></span>
+                            General
+                        </h2>
+                        <div>
+                            <div className="flex items-center justify-between p-4 bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl border border-zinc-200 dark:border-zinc-700">
+                                <div className="flex items-center space-x-3">
+                                    <AlertTriangle className={`w-5 h-5 ${warningCount > 0 ? 'text-red-500' : 'text-green-500'}`} />
+                                    <div>
+                                        <div className="font-semibold text-zinc-700 dark:text-zinc-300">Active Warnings</div>
+                                        <div className="text-sm text-zinc-500">
+                                            {warningCount > 0 ? `${warningCount} active warning${warningCount > 1 ? 's' : ''} affecting your KPI grade` : 'No active warnings'}
+                                        </div>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={resetWarnings}
+                                    disabled={resettingWarnings || warningCount === 0}
+                                    className={`px-4 py-2 rounded-xl font-medium text-sm transition-all duration-300 flex items-center space-x-2 ${
+                                        warningCount === 0
+                                            ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-400 cursor-not-allowed"
+                                            : resettingWarnings
+                                            ? "bg-orange-100 dark:bg-orange-900/30 text-orange-600 cursor-wait"
+                                            : "bg-red-500 hover:bg-red-600 text-white hover:shadow-lg"
+                                    }`}
+                                >
+                                    <RefreshCw className={`w-4 h-4 ${resettingWarnings ? 'animate-spin' : ''}`} />
+                                    <span>{resettingWarnings ? 'Resetting...' : 'Reset Warnings'}</span>
+                                </button>
+                            </div>
+                            <p className="mt-4 text-sm text-zinc-500 font-medium">
+                                Each active warning reduces your KPI grade by 1 level. Reset warnings to restore your full grade potential.
                             </p>
                         </div>
                     </div>

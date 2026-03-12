@@ -102,7 +102,7 @@ export default function DashboardPage() {
           {/* Today's Commission - Full Width */}
           <div className="p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-center shadow-sm hover:shadow-md transition-shadow">
             <div className="text-xs font-bold uppercase tracking-widest text-zinc-400 mb-2">{"Today's Commission"}</div>
-            <div className="text-4xl font-black text-black dark:text-white">{summary.todayCommission.toFixed(2)}</div>
+            <div className="text-4xl font-black text-black dark:text-white">MMK {summary.todayCommission.toLocaleString()}</div>
           </div>
           
           {/* Today's Delivery and Today's Pickup - Side by side */}
@@ -124,7 +124,7 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="p-8 rounded-3xl bg-black dark:bg-white text-center shadow-lg shadow-black/10 transition-transform hover:scale-[1.02]">
               <div className="text-xs font-bold uppercase tracking-widest text-zinc-400 mb-2">MTD Earnings</div>
-              <div className="text-4xl font-black text-white dark:text-black">{summary.mtdEarnings.toFixed(2)}</div>
+              <div className="text-4xl font-black text-white dark:text-black">MMK {summary.mtdEarnings.toLocaleString()}</div>
               <div className="text-xs font-medium text-zinc-300 dark:text-zinc-600 mt-1">MMK</div>
             </div>
 

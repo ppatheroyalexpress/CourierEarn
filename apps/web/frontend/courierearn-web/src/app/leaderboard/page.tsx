@@ -1,21 +1,35 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Trophy, Medal, Award, User, Building2 } from "lucide-react";
+import { Trophy, Medal, Award, User, Building2, AlertTriangle, Crown } from "lucide-react";
 
 interface LeaderboardUser {
   id: string;
   username: string;
   branch: string;
-  totalKpi: number;
-  deliveryKpi: number;
-  pickupKpi: number;
+  grade: number;
+  percentage: number;
+  warnings: number;
+  deliveryScore: number;
+  pickupScore: number;
+  ecScore: number;
+  totalScore: number;
   rank: number;
+}
+
+interface MonthlyChampion {
+  month: string;
+  champion: { id: string; username: string } | null;
+  runner_up: { id: string; username: string } | null;
+  third_place: { id: string; username: string } | null;
+  champion_grade: number;
+  champion_percentage: number;
 }
 
 interface LeaderboardResponse {
   leaderboard: LeaderboardUser[];
   currentUserRank: LeaderboardUser | null;
+  monthlyChampions: MonthlyChampion | null;
 }
 
 export default function LeaderboardPage() {
@@ -41,6 +55,36 @@ export default function LeaderboardPage() {
 
     fetchLeaderboard();
   }, []);
+
+  const getGradeColor = (grade: number) => {
+    switch (grade) {
+      case 5:
+        return "bg-gradient-to-r from-green-400 to-green-600 text-white";
+      case 4:
+        return "bg-gradient-to-r from-blue-400 to-blue-600 text-white";
+      case 3:
+        return "bg-gradient-to-r from-yellow-400 to-yellow-600 text-white";
+      case 2:
+        return "bg-gradient-to-r from-orange-400 to-orange-600 text-white";
+      case 1:
+        return "bg-gradient-to-r from-red-400 to-red-600 text-white";
+      default:
+        return "bg-gray-100 text-gray-700";
+    }
+  };
+
+  const getWarningDisplay = (warnings: number) => {
+    if (warnings > 0) {
+      return (
+        <div className="flex items-center space-x-2 text-sm text-red-500">
+          <AlertTriangle className="w-4 h-4" />
+          <span>{warnings} warning{warnings > 1 ? "s" : ""}</span>
+        </div>
+      );
+    } else {
+      return null;
+    }
+  };
 
   const getRankIcon = (rank: number) => {
     switch (rank) {
@@ -111,10 +155,13 @@ export default function LeaderboardPage() {
               <div className="flex items-center space-x-4">
                 <span className="text-2xl font-bold text-blue-600">#{data.currentUserRank.rank}</span>
                 <div className="text-right">
-                  <p className="text-sm text-blue-700">{data.currentUserRank.totalKpi.toFixed(1)} total KPI</p>
-                  <p className="text-xs text-blue-600">
-                    {data.currentUserRank.deliveryKpi.toFixed(1)} delivery • {data.currentUserRank.pickupKpi.toFixed(1)} pickup
-                  </p>
+                  <div className="flex items-center space-x-2">
+                    <span className={`px-2 py-1 text-xs font-bold rounded ${getGradeColor(data.currentUserRank.grade)}`}>
+                      Grade {data.currentUserRank.grade}
+                    </span>
+                    <span className="text-sm text-blue-700">{data.currentUserRank.percentage.toFixed(1)}%</span>
+                  </div>
+                  {getWarningDisplay(data.currentUserRank.warnings)}
                 </div>
               </div>
             </div>
@@ -154,11 +201,19 @@ export default function LeaderboardPage() {
                   </div>
                   
                   <div className="text-right">
-                    <div className="text-2xl font-bold text-gray-900">{user.totalKpi.toFixed(1)}</div>
-                    <div className="text-xs text-gray-500">
-                      <span className="font-medium text-green-600">{user.deliveryKpi.toFixed(1)} delivery</span>
+                    <div className="flex items-center space-x-2 mb-1">
+                      <span className={`px-2 py-1 text-xs font-bold rounded ${getGradeColor(user.grade)}`}>
+                        Grade {user.grade}
+                      </span>
+                      <span className="text-lg font-bold text-gray-900">{user.percentage.toFixed(1)}%</span>
+                    </div>
+                    {getWarningDisplay(user.warnings)}
+                    <div className="text-xs text-gray-500 mt-1">
+                      <span className="font-medium text-green-600">{user.deliveryScore} delivery</span>
                       <span className="mx-1">•</span>
-                      <span className="font-medium text-blue-600">{user.pickupKpi.toFixed(1)} pickup</span>
+                      <span className="font-medium text-blue-600">{user.pickupScore} pickup</span>
+                      <span className="mx-1">•</span>
+                      <span className="font-medium text-purple-600">{user.ecScore} EC</span>
                     </div>
                   </div>
                 </div>
@@ -167,9 +222,51 @@ export default function LeaderboardPage() {
           </div>
         </div>
 
+        {/* Monthly Champions Section */}
+        {data?.monthlyChampions && (
+          <div className="mt-8 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-6 border border-purple-200">
+            <div className="flex items-center space-x-2 mb-4">
+              <Crown className="w-6 h-6 text-purple-600" />
+              <h2 className="text-xl font-semibold text-purple-900">Monthly Champions</h2>
+              <span className="text-sm text-purple-600">
+                ({new Date(data.monthlyChampions.month + "-01").toLocaleDateString('en-US', { month: 'long', year: 'numeric' })})
+              </span>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {data.monthlyChampions.champion && (
+                <div className="text-center p-4 bg-white rounded-lg border border-purple-200">
+                  <Trophy className="w-8 h-8 text-yellow-500 mx-auto mb-2" />
+                  <div className="font-semibold text-gray-900">{data.monthlyChampions.champion.username}</div>
+                  <div className="text-sm text-purple-600">Champion</div>
+                  <div className="text-xs text-gray-500 mt-1">Grade {data.monthlyChampions.champion_grade} • {data.monthlyChampions.champion_percentage.toFixed(1)}%</div>
+                </div>
+              )}
+              
+              {data.monthlyChampions.runner_up && (
+                <div className="text-center p-4 bg-white rounded-lg border border-purple-200">
+                  <Medal className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                  <div className="font-semibold text-gray-900">{data.monthlyChampions.runner_up.username}</div>
+                  <div className="text-sm text-purple-600">Runner Up</div>
+                </div>
+              )}
+              
+              {data.monthlyChampions.third_place && (
+                <div className="text-center p-4 bg-white rounded-lg border border-purple-200">
+                  <Award className="w-8 h-8 text-orange-600 mx-auto mb-2" />
+                  <div className="font-semibold text-gray-900">{data.monthlyChampions.third_place.username}</div>
+                  <div className="text-sm text-purple-600">Third Place</div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         <div className="mt-6 text-center text-sm text-gray-500">
-          <p>KPI Points Calculation:</p>
-          <p>Cash/Not Cash Collect: 1 point each • EC: 1 point each • Pickup House: 1 point each • Pickup Parcel: 0.1 point each</p>
+          <p>Royal Express KPI System:</p>
+          <p>Commission: Cash × 200 + Not Cash × 100 + Pickup Parcels × 50 MMK</p>
+          <p>Grading: Based on branch targets (A/B/C grades) with percentage-based achievement levels</p>
+          <p>Warnings: Each active warning reduces grade by 1 level</p>
         </div>
       </div>
     </div>

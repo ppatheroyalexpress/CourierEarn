@@ -5,8 +5,8 @@ import { StyleSheet, Text, View } from 'react-native';
 const API_BASE_URL = 'https://courier-earn.vercel.app/api';
 
 export default function App() {
-  const [status, setStatus] = useState('Loading...');
-  const [data, setData] = useState(null);
+  const [status, setStatus] = useState<string>('Loading...');
+  const [data, setData] = useState<any>(null);
 
   useEffect(() => {
     async function testFetch() {
@@ -16,7 +16,7 @@ export default function App() {
         const result = await response.json();
         setData(result);
       } catch (error) {
-        setStatus('Error: ' + error.message);
+        setStatus('Error: ' + (error as Error).message);
       }
     }
     testFetch();

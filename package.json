@@ -2,13 +2,13 @@
     "name": "courierearn-monorepo",
     "private": true,
     "workspaces": [
-        "web/frontend/courierearn-web",
-        "app",
+        "apps/web/frontend/courierearn-web",
+        "apps/mobile",
         "packages/*"
     ],
     "scripts": {
         "web:dev": "npm run dev --workspace=@courierearn/web",
-        "app:start": "npm start --workspace=@courierearn/app",
+        "mobile:start": "npm start --workspace=@courierearn/app",
         "build:shared": "npm run build --workspace=@courierearn/shared"
     },
     "devDependencies": {

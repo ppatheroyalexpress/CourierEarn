@@ -2,7 +2,7 @@
     "name": "courierearn-monorepo",
     "private": true,
     "workspaces": [
-        "apps/web/frontend/courierearn-web",
+        "apps/web/frontend",
         "apps/mobile",
         "packages/*"
     ],

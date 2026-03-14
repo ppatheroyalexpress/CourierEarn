@@ -3,5 +3,10 @@
   "outputDirectory": "apps/web/frontend/.next",
   "installCommand": "cd apps/web/frontend && npm install",
   "framework": "nextjs",
-  "rootDirectory": "apps/web/frontend"
+  "rootDirectory": "apps/web/frontend",
+  "env": {
+    "NEXT_PUBLIC_SUPABASE_URL": "@supabase-url",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "@supabase-anon-key",
+    "SUPABASE_SERVICE_ROLE_KEY": "@supabase-service-role-key"
+  }
 }
